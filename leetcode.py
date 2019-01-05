@@ -113,7 +113,7 @@ import random
 random.randint(0, 10) # including 0 and 10
 
 #####################################################
-#                  Data Structures                  #
+#          Python BUILT-IN DATA STRUCTURE           #
 #####################################################
 
 # list
@@ -141,6 +141,9 @@ hash.values()
 hash.values()
 hash.popitem() # return a tuple
 
+from collections import defaultdict
+hash = defaultdict(int) # default value is 0
+
 # set
 s = set()
 t = set()
@@ -152,34 +155,198 @@ s & t # intersection
 s ^ t # symmetric difference, either in s or t but not both
 
 # stack
+stack = [1,2]
+stack.append(3)
+stack.pop()
+stack[-1] # the last element
 
 # queue
+from collections import deque
+queue = deque([4])
+queue.append(3)
+queue.popleft()
+queue[0] # raise error if empty
 
 # deque
+from collections import deque
+queue = deque([4])
+queue.append(5)
+queue.appendleft(1)
+queue.pop()
+queue.popleft()
 
 # linked list
 
 # ordered map
+from collections import OrderedDict
+ordered_hash = OrderedDict()
 
 # doubly linked list
 
 # heap
+from heapq import *
+min_heap = []
+heapify(min_heap) # O(N), build min heap
+heappush(min_heap, (key1, key2)) # O(log n) , sorted by key1 -> key2
+heappop(min_heap) # O(log n)
+heappushpop(min_heap, item) # O(log n), push an element and pop the smallest one
+min_heap[0] # get smallest
+
+max_heap = []
+heappush(max_heap, -element)
+-heappop(max_heap)
+-max_heap[0] # get smallest
+
+# priority queue
+from queue import PriorityQueue
+pq = PriorityQueue(maxsize=3)
+pq.put(3)
+pq.get() # return 3
+pq.queue # see all the elements
+
+
+#####################################################
+#          CUSTOM BUILT-IN DATA STRUCTURE           #
+#####################################################
+
+# dict
+
+# stack
+
+# queue
 
 # dict + DLL
 
 # trie
 
 # union find
+class UnionFind():
+    def __init__(self, N):
+        self.ids = list(range(N))
+        self.rank = [0] * N
+        self.count = N
 
-# segement tree
+    def find(self, p):
+        ids = self.ids
+
+        while p != ids[p]:
+            ids[p] = ids[ ids[p] ]
+            p = ids[p]
+
+        return p
+
+    def conntected(self, p, q):
+        return self.find(p) == self.find(q)
+
+    def union(self, p, q):
+        ids = self.ids
+        rank = self.rank
+
+        p_root = ids[p]
+        q_root = ids[q]
+
+        if p_root == q_root:
+            return
+
+        self.count -= 1
+        if rank[p_root] > rank[q_root]:
+            ids[q_root] = p_root
+        elif rank[p_root] < rank[q_root]:
+            ids[p_root] = q_root
+        else:
+            rank[p_root] += 1
+            ids[q_root] = p_root
+
+# segement tree (sum)
+class SegmentTreeNode():
+    def __init__(self, start, end, sum):
+        self.start = start
+        self.end = end
+        self.sum = sum # depends on use case
+        self.left = self.right = None # children are SegementTreeNode as well
+
+def buildS(start, end, A):
+    if start > end:
+        return None
+    if start == end:
+        return SegmentTreeNode(start, end, A[start])
+
+    root = SegmentTreeNode(start, end, 0)
+    mid = (start + end) // 2
+    root.left = buildS(start, mid, A)
+    root.right = buildS(mid + 1, end, A)
+    root.sum = root.left.sum + root.right.sum # depends on use case
+
+    return root
+
+def queryS(root, start, end):
+    if root.start == start and root.end == end:
+        return root.sum # depends on use case
+
+    mid = (root.start + root.end) // 2
+    # depends on use case
+    l_sum, r_sum = 0, 0
+    if start <= mid:
+        if end <= mid:
+            l_sum = queryS(root.left, start, end)
+        else:
+            l_sum = queryS(root.left, start, mid)
+    if end > mid:
+        if start > mid:
+            r_sum = queryS(root.right, start, end)
+        else:
+            r_sum = queryS(root.right, mid + 1, end)
+    return l_sum + r_sum
+
+def modifyS(root, index, val):
+    if root.start == index and root.end == index:
+        root.sum = val # depends on use case
+        return
+
+    mid = (root.start + root.end) // 2
+    if root.start <= index <= mid:
+        modifyS(root.left, index, val)
+    if mid < index <= root.end:
+        modifyS(root.right, index, val)
+    root.sum = root.left.sum + root.right.sum # depends on use case
+    return
+
+
+a = [4,6,2,3]
+root = buildS(0, len(a) - 1, a) # use array a to build a segement tree
+queryS(root, 2, 3) # query the sum from index 2 to index 3 (including)
+modifyS(root, 3, 20) # change the value at index 3 to 20
 
 # binary indexed tree
+class BIT():
+    def __init__(self, A):
+        n = len(A)
+        self.bit = [0] * (n + 1)
+        for i in range(0, n):
+            self.update(i, n, A[i])
+
+    def update(self, i, n, num):
+        i += 1
+        while i <= n:
+            self.bit[i] += num
+            i += i & (-i)
+
+    def query(self, i):
+        i += 1
+        sum = 0
+        while i > 0:
+            sum += self.bit[i]
+            i -= i & (-i)
+
+        return sum
+
+BIT = BIT([1,2,3,4,5])
+BIT.query(2) # query the sum from index 0 to index 2
 
 #####################################################
 #                    BACKTRACKING                   #
 #####################################################
 
-# subsets
 # https://leetcode.com/problems/subsets/description
 def dfs(self, pos, nums, path, res):
     # preorder operations
@@ -200,3 +367,4 @@ def dfs(self, pos, nums, path, res):
         # post-backtracking
         path.pop()
 
+    # postorder
