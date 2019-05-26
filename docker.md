@@ -12,6 +12,8 @@ docker container stats # performance stats for all containers
 docker network create [net_name] # create a virtual network
 docker image inspect/history [image_name] # show the spec of the image
 docker image tag [source_image] [target_image] # create a tag target_image that refers to source_image
+docker volume ls # show all the volume
+docker-compose up
 ```
 
 ## example
@@ -34,4 +36,16 @@ docker network create my_net
 
 # create a elasticsearch container, and attach this to "my_net" virtual network, and have a DNS alias name "search"
 docker container run --net my_net --net-alias search elasticsearch:2
+
+# create a mysql container, and named volume
+docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v mysql-db:/var/lib/mysql mysql
+
+# create a mysql container, and have a bind mount(bind the current directory to /var/lib/mysql in the container)
+docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -v $(pwd):/var/lib/mysql mysql
 ```
+
+## Dockerfile
+1. `FROM`:import an image 
+2. `ENV`: set environment variable
+3. `RUN`: execute shell command
+4. `CMD`: run the command when container is launched

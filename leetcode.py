@@ -209,12 +209,6 @@ pq.queue # see all the elements
 #          CUSTOM BUILT-IN DATA STRUCTURE           #
 #####################################################
 
-# dict
-
-# stack
-
-# queue
-
 # dict + DLL
 
 # trie
@@ -368,3 +362,23 @@ def dfs(self, pos, nums, path, res):
         path.pop()
 
     # postorder
+
+
+#####################################################
+#                        DFS                        #
+#####################################################
+
+# https://leetcode.com/problems/maximum-depth-of-binary-tree/description/
+def helper(self, root):
+    # preorder
+
+    # terminating condition
+    if not root.left and not root.right:
+        return 1
+
+    # inroder
+    left = self.helper(root.left) if root.left else 0
+    right = self.helper(root.right) if root.right else 0
+
+    # postorder
+    return max(left, right) + 1
